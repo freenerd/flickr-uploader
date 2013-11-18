@@ -15,8 +15,11 @@ It's a ruby script. I used ruby 2.0 for development, but it should also run with
 ## Usage
 ### Examples
 
-`ruby flickr-uploader.rb --help`
-`ruby flickr-uploader.rb --upload "/Users/johan/Pictures/vacation"
+```
+ruby flickr-uploader.rb --help
+ruby flickr-uploader.rb --upload "/Users/johan/Pictures/vacation" --photoset-name "Vacation 2013"
+ruby flickr-uploader.rb --delete-photoset 1234567890123
+```
 
 ### Authentication
 
