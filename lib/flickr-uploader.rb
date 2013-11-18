@@ -99,18 +99,19 @@ class FlickrUpload
       @dry = dry
       @directory = directory
 
+      new_log = { :runs => [], :photos => [], :photoset => {} }
+
       if File.exists?(LOG_FILENAME)
         file = File.open(LOG_FILENAME, "r")
         @log_file = YAML.load(file.read)
         file.close
       else
         @log_file = {
-          directory =>
-            { :runs => [], :photos => [], :photoset => {} }
+          directory => new_log
         }
       end
 
-      @log = @log_file[directory]
+      @log = @log_file[directory] || new_log
       @log[:runs] << Time.now.to_s
     end
 
