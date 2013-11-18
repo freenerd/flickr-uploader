@@ -43,7 +43,7 @@ If you run any command with the `-d` switch, it will still show the output but n
 
 ### What if something goes wrong during the upload?
 
-If there is an error furing the upload of a file, the script will just try again. But you can also quit the script via `CTRL-C`. If so, you can just restart the script with the same commands as before and the script will continue from where it left off. All progress (read: all uploaded photos) is saved to `log.yml`. If something is fishy, delete the `log.yml` file and start the upload again from the beginning.
+If there is an error during the upload of a file, the script will just try again. But you can also quit the script via `CTRL-C`. If so, you can just restart the script with the same commands as before and the script will continue from where it left off. All progress (read: all uploaded photos) is saved to `log.yml`. If something is fishy, delete the `log.yml` file and start the upload again from the beginning.
 
 ## Contributing
 Fork away. I'm happy to accept pull requests, there is a lot of stuff to be added.
