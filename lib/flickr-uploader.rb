@@ -65,7 +65,7 @@ class FlickrUpload
 
       puts "Open the following url in your browser and approve the application"
       puts auth_url
-      puts "Now copy here the number given in the browser:"
+      puts "Then copy here the number given in the browser and press enter:"
       verify = gets.strip
 
       begin
@@ -95,17 +95,22 @@ class FlickrUpload
   class Log
     LOG_FILENAME = "log.yml"
 
-    def initialize(dry=False)
+    def initialize(directory, dry=false)
       @dry = dry
+      @directory = directory
 
       if File.exists?(LOG_FILENAME)
         file = File.open(LOG_FILENAME, "r")
-        @log = YAML.load(file.read)
+        @log_file = YAML.load(file.read)
         file.close
       else
-        @log = { :runs => [], :photos => [], :photoset => {} }
+        @log_file = {
+          directory =>
+            { :runs => [], :photos => [], :photoset => {} }
+        }
       end
 
+      @log = @log_file[directory]
       @log[:runs] << Time.now.to_s
     end
 
@@ -128,7 +133,8 @@ class FlickrUpload
     def write
       unless @dry
         File.open(LOG_FILENAME, "w") do |file|
-          file.puts(YAML.dump(@log))
+          @log_file[@directory] = @log
+          file.puts(YAML.dump(@log_file))
         end
       end
     end
@@ -143,11 +149,10 @@ class FlickrUpload
 
     @options = options
     puts "Dry Run" if @options[:dry]
-
-    @log = Log.new(@options[:dry])
   end
 
   def upload
+    intialize_log
     upload_directory(@options[:directory])
   end
 
@@ -158,7 +163,6 @@ class FlickrUpload
   end
 
   def delete_photoset(photoset_id)
-
     begin
       photoset = flickr.photosets.getInfo(:photoset_id => photoset_id)
     rescue FlickRaw::FailedResponse
@@ -208,6 +212,10 @@ class FlickrUpload
   end
 
   private
+
+  def intialize_log
+    @log = Log.new(@options[:directory], @options[:dry])
+  end
 
   def upload_directory(directory)
     raise "Can't find directory #{directory}" unless Dir.exists?(directory)
