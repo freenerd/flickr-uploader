@@ -24,8 +24,12 @@ options_parser =
       options[:public] = true
     end
 
-    opts.on("-n", "--photoset-name NAME", "Creates a photoset with the given name and adds all uploaed items to it") do |name|
-      options[:photoset] = name
+    opts.on("-n", "--photoset-name NAME", "Creates a photoset with the given name and adds all uploaded items to it") do |name|
+      options[:photoset_name] = name
+    end
+
+    opts.on("--photoset-id ID", "Adds all uploaded items to the photoset with the ID") do |id|
+      options[:photoset_id] = id
     end
 
     opts.on("-d", "--dry", "Don't do the action, but only act as if and show the according output") do

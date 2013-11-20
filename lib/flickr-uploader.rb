@@ -116,7 +116,7 @@ class FlickrUpload
     end
 
     def photoset
-      @log[:photoset]
+      @log[:photoset] || {}
     end
 
     def photoset=(dict)
@@ -153,7 +153,8 @@ class FlickrUpload
   end
 
   def upload
-    intialize_log
+    initialize_log
+    initialize_photoset
     upload_directory(@options[:directory])
   end
 
@@ -214,8 +215,17 @@ class FlickrUpload
 
   private
 
-  def intialize_log
+  def initialize_log
     @log = Log.new(@options[:directory], @options[:dry])
+  end
+
+  def initialize_photoset
+    unless @log.photoset[:id]
+      @log.photoset = {
+        :id => @options[:photoset_id],
+        :name => @options[:photoset_name]
+      }
+    end
   end
 
   def upload_directory(directory)
@@ -232,7 +242,7 @@ class FlickrUpload
       else
         photo_id = upload_photo(filename)
         make_private    photo_id unless @options[:public]
-        add_to_photoset photo_id if @log.photoset[:id] || @options[:photoset]
+        add_to_photoset photo_id if @log.photoset[:id]
         @log.add_photo  photo_id, filename
         @log.write
       end
@@ -242,13 +252,10 @@ class FlickrUpload
   end
 
   def upload_photo(filename)
-    begin
-      photo_id = flickr.upload_photo(filename) unless @options[:dry]
-    rescue => e
-      puts "Photo upload failed with error message #{e}. Trying again in a bit ..."
-      sleep 2
-      retry
-    end
+    photo_id =
+      execute do
+        flickr.upload_photo(filename)
+      end
 
     puts "Uploaded picture #{filename} to id #{photo_id}"
 
@@ -256,7 +263,7 @@ class FlickrUpload
   end
 
   def make_private(photo_id)
-    unless @options[:dry]
+    execute do
       flickr.photos.setPerms(
         :photo_id => photo_id,
         :is_public => 0,
@@ -264,14 +271,14 @@ class FlickrUpload
         :is_family => 0,
         :perm_comment => 3,
         :perm_addmeta => 3
-      ) unless @options[:dry]
+      )
     end
 
     photo_id
   end
 
   def add_to_photoset(photo_id)
-    unless @options[:dry]
+    execute do
       if @log.photoset[:id]
         flickr.photosets.addPhoto(
           :photoset_id => @log.photoset[:id],
@@ -290,6 +297,18 @@ class FlickrUpload
     puts "Added photo #{photo_id} to photoset #{@log.photoset[:id]} #{@log.photoset[:name]}"
 
     photo_id
+  end
+
+  def execute(&block)
+    unless @options[:dry]
+      begin
+        return block.call
+      rescue => e
+        puts "Call to Flickr API failed with error #{e}. Trying again in a bit ..."
+        sleep 2
+        retry
+      end
+    end
   end
 
   def get_most_recent
