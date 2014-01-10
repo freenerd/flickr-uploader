@@ -8,6 +8,9 @@ This script helps you to upload a lot of pictures to Flickr. If the upload fails
 It's a ruby script. I used ruby 2.0 for development, but it should also run with ruby 1.9.x. Packet management is done via bundler.
 
 ```
+  git clone https://github.com/freenerd/flickr-uploader.git
+  cd flickr-uploader
+
   gem install bundler
   bundle install
 ```
