@@ -242,7 +242,7 @@ class FlickrUpload
       else
         photo_id = upload_photo(filename)
         make_private    photo_id unless @options[:public]
-        add_to_photoset photo_id if @log.photoset[:id]
+        add_to_photoset photo_id if @log.photoset[:id] or @log.photoset[:name]
         @log.add_photo  photo_id, filename
         @log.write
       end
@@ -285,7 +285,7 @@ class FlickrUpload
           :photo_id => photo_id)
       else
         photoset = flickr.photosets.create(
-          :title => @options[:photoset],
+          :title => @options[:photoset_name],
           :primary_photo_id => photo_id)
         @log.photoset = {
           :id => photoset["id"],
