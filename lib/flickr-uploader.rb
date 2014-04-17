@@ -240,11 +240,15 @@ class FlickrUpload
       if @log.already_uploaded?(filename)
         puts "File #{filename} has already been uploaded. Skipping."
       else
-        photo_id = upload_photo(filename)
-        make_private    photo_id unless @options[:public]
-        add_to_photoset photo_id if @log.photoset[:id] or @log.photoset[:name]
-        @log.add_photo  photo_id, filename
-        @log.write
+        begin
+          photo_id = upload_photo(filename)
+          make_private    photo_id unless @options[:public]
+          add_to_photoset photo_id if @log.photoset[:id] or @log.photoset[:name]
+          @log.add_photo  photo_id, filename
+          @log.write
+        rescue => e
+            puts "Failed to upload #{filename} with error #{e}"
+        end
       end
     end
 
@@ -304,11 +308,23 @@ class FlickrUpload
       begin
         return block.call
       rescue => e
-        puts "Call to Flickr API failed with error #{e}. Trying again in a bit ..."
-        sleep 2
-        retry
+        if is_retry_error(e)
+          puts "Call to Flickr API failed with error #{e}. Trying again in a bit ..."
+          sleep 2
+          retry
+        else
+          raise e
+        end
       end
     end
+  end
+
+  def is_retry_error(e)
+    [      # codes according to https://secure.flickr.com/services/api/upload.api.html
+      3,   # general upload error
+      105, # Service currently unavailable
+      106  # Write operation failed
+    ].include?(e.code)
   end
 
   def get_most_recent
