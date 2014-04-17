@@ -33,7 +33,7 @@ class FlickrUpload
         puts "Do you want to connect a new account? [y/n]"
         input = gets.chomp
 
-        return if input.match /n/i
+        return if input.match(/n/i)
       end
 
       authenticate
@@ -176,7 +176,7 @@ class FlickrUpload
     puts "You are about to delete photoset #{photoset.id} #{photoset.title} with #{photoset.count_photos} photos and #{photoset.count_videos} videos"
     puts "Are you sure, you want to delete that photoset including all photos and videos? [y/n]"
     input = gets.chomp
-    return if input.match /n/i
+    return if input.match(/n/i)
 
     counter = {
       :deleted => 0,
