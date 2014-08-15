@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    flickraw (0.9.6)
+    flickraw (0.9.8)
 
 PLATFORMS
   ruby
