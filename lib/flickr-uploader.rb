@@ -234,7 +234,7 @@ class FlickrUpload
     files = Dir.glob(File.join(directory, "*"))
     puts "Found #{files.length} files in the directory"
 
-    files.each_with_index do |filename, index|
+    files.sort.each_with_index do |filename, index|
       print "[#{index+1}/#{files.length}] "
 
       if @log.already_uploaded?(filename)
